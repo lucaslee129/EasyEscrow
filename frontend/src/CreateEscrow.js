@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Spinner from './Spinner';
 import { isNa } from './Utils';
@@ -9,7 +9,11 @@ function CreateEscrow(props) {
     const [sequence, setSequence] = useState(null);
     const [recAddr, setRecAddr] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [links, setLinks] = useState([]);
+    const [links, setLinks] = useState([
+        // "http://localhost:3000/reference/10",
+        // "http://localhost:3000/validate/10",
+        // "http://localhost:3000/complete/10"
+    ]);
 
     const makeLinks = (uid) => {
         return ["http://localhost:3000/reference/" + uid, "http://localhost:3000/validate/" + uid, "http://localhost:3000/complete/" + uid];
@@ -32,6 +36,8 @@ function CreateEscrow(props) {
                     'Content-Type': 'application/json',
                 },
             });
+
+            console.log("<<<<<<Response Data:", response.data["id"]);
 
             if (response.status === 200) {
                 setLinks(makeLinks(response.data["id"]))

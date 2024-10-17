@@ -59,36 +59,47 @@ def createCondition():
 
 def createEscrow(seed, sequence, rec_addr, amount, expiration):
 
-    sender_wallet = Wallet(seed, sequence)
+    # sender_wallet = Wallet(seed, sequence)
     condition, fulfillment = createCondition()
 
+    print("\nCondition:", condition)
+    print("\n Fulfillment: ", fulfillment)
+
+
     # Build escrow create transaction
-    create_txn = EscrowCreate(
-        account=sender_wallet.classic_address,
-        amount=xrp_to_drops(amount),
-        destination=rec_addr,
-        finish_after=datetime_to_ripple_time(
-            datetime.now() + timedelta(seconds=15)
-        ),  # Temporary to reduce load on nlp enpoint
-        cancel_after=datetime_to_ripple_time(expiration),
-        condition=condition,
-    )
+    # create_txn = EscrowCreate(
+    #     account=sender_wallet.classic_address,
+    #     amount=xrp_to_drops(amount),
+    #     destination=rec_addr,
+    #     finish_after=datetime_to_ripple_time(
+    #         datetime.now() + timedelta(seconds=15)
+    #     ),  # Temporary to reduce load on nlp enpoint
+    #     cancel_after=datetime_to_ripple_time(expiration),
+    #     condition=condition,
+    # )
 
     # Sign and send transaction
     # stxn = safe_sign_and_autofill_transaction(create_txn, sender_wallet, client)
     # stxn_response = send_reliable_submission(stxn, client)
 
-    stxn_response = submit_and_wait(create_txn, client, sender_wallet)
+    # stxn_response = submit_and_wait(create_txn, client, sender_wallet)
 
-    if stxn_response is None:
-        raise Exception("Escrow creation failed")
+    # if stxn_response is None:
+    #     raise Exception("Escrow creation failed")
 
+    # return {
+    #     "creator": sender_wallet.classic_address,
+    #     "reciever": rec_addr,
+    #     "sequence": sequence,
+    #     "condition": condition,
+    #     "fulfillment": fulfillment,
+    # }
     return {
-        "creator": sender_wallet.classic_address,
-        "reciever": rec_addr,
-        "sequence": sequence,
-        "condition": condition,
-        "fulfillment": fulfillment,
+        "creator": "axf54a8453as54d",
+        "reciever": "axf54a8453as54d",
+        "sequence": 3210123,
+        "condition": "A025802088801FDFC1F22280E63E1571BDA525135C2DA4CD05C54519BDC6E568DEFA9704810120",
+        "fulfillment": "A022802090781A8501872055A41288C915469D289F19AFAAB4F2DB77437EB0BB7B37460C",
     }
 
 
@@ -100,16 +111,20 @@ def finishEscrowDict(dict):
 
 def finishEscrow(creator, sequence, condition, fulfillment):
 
-    temp_wallet = generate_faucet_wallet(client=client)
+    print("\n Creator: ", creator)
+    print("\n Sequence: ", sequence)
+    print("\n Condition: ", condition)
+    print("\n Fulfillment: ", fulfillment)
+    # temp_wallet = generate_faucet_wallet(client=client)
 
     # Build escrow finish transaction
-    finish_txn = EscrowFinish(
-        account=temp_wallet.classic_address,
-        owner=creator,
-        offer_sequence=sequence,
-        condition=condition,
-        fulfillment=fulfillment,
-    )
+    # finish_txn = EscrowFinish(
+    #     account=temp_wallet.classic_address,
+    #     owner=creator,
+    #     offer_sequence=sequence,
+    #     condition=condition,
+    #     fulfillment=fulfillment,
+    # )
 
     # Sign transaction with wallet
     # stxn = safe_sign_and_autofill_transaction(finish_txn, temp_wallet, client)
@@ -117,11 +132,11 @@ def finishEscrow(creator, sequence, condition, fulfillment):
     # Send transaction and wait for response
     # stxn_response = send_reliable_submission(stxn, client)
 
-    stxn_response = submit_and_wait(finish_txn, client, temp_wallet)
+    # stxn_response = submit_and_wait(finish_txn, client, temp_wallet)
 
 
     # Parse response and return result
-    return stxn_response.result
+    # return stxn_response.result
 
 
 def validateEscrow(escrow_result):

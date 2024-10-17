@@ -67,10 +67,18 @@ def hello_world():
     print(file)
     extracted_text = extract_text_from_pdf(file)
     print(extracted_text)
-    components = getComponents(extracted_text)
-    components = json.loads(components)
-    print(components)
-    return jsonify({"components": components})
+    # components = getComponents(extracted_text)
+    # components = json.loads(components)
+    # print(components)
+    response_components = {
+        "amount":"1000.00",
+        "condition": "Successful completion of the construction and delivery of a table made out of cherry wood",
+        "expiration": "2023-04-01T12:00:00",
+        "reciever": "Kyle Bond",
+        "sender": "Ethan Bond",
+        "thirdParty": "Keanu Reeves"
+    }
+    return jsonify({"components": response_components})
 
 
 @app.route("/escrow", methods=["POST"])
@@ -80,7 +88,7 @@ def escrow():
     # { seed, sequence, xaddress, condition }
     data = request.get_json()
     components = data.get("components")
-
+    
     seed = data.get("seed")
     sequence = data.get("sequence")
     rec_addr = data.get("rec_addr")
@@ -88,9 +96,9 @@ def escrow():
     amount = float(components.get("amount")) / usdToXrp()
 
     expiration = parser.parse(components.get("expiration"))
-    # print("helloooo", file=sys.stdout)
-    # print(type(expiration))
-    # print(expiration)
+    ### print("helloooo", file=sys.stdout)
+    ### print(type(expiration))
+    ### print(expiration)
     txn_data = createEscrow(seed, sequence, rec_addr, amount, expiration)
 
     uid = str(uuid.uuid4())
@@ -102,6 +110,9 @@ def escrow():
     }
 
     MAPPINGS[uid] = metadata
+
+    print("\n\nMAPPINGS>>>>>>>>>>>> : ", MAPPINGS)
+    print("\n\n<<<<<<<<<<<<<id", uid)
 
     return jsonify({"metadata": metadata, "id": uid})
 
@@ -119,6 +130,7 @@ def validate(txnId):
 
 @app.route("/reference/<uid>", methods=["GET"])
 def reference(uid):
+    print("MAPPINGS>>>>>>>>>>>> : ", MAPPINGS);
     return jsonify({"reference": MAPPINGS.get(uid)})
 
 

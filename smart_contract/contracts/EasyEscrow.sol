@@ -12,6 +12,7 @@ contract EasyEscrow {
         bool finished;
         bool closed;
         bool released;
+        bool disputed;
     }
 
     mapping(uint256 => Escrow) public escrows;
@@ -48,6 +49,7 @@ contract EasyEscrow {
         newEscrow.finished = false;
         newEscrow.closed = false;
         newEscrow.released = false;
+        newEscrow.disputed = false;
 
         emit EscrowCreated(uuid, msg.sender, recipient, msg.value);
         return uuid;
@@ -67,6 +69,7 @@ contract EasyEscrow {
         Escrow storage escrow = escrows[uuid];
         require(escrow.validator == msg.sender, "Only the validator can validate the escrow");
         require(escrow.closed == false, "Escrow is already closed");
+        require(escrow.disputed == true, "Escrow is not disputed");
         if(fundRelease == true) {
             payable(escrow.recipient).transfer(escrow.amount);
         } else {
@@ -74,6 +77,12 @@ contract EasyEscrow {
         }
         escrow.closed = true;
         escrow.released = true;
+    }
+
+    function raiseDispute(uint256 uuid) external {
+        Escrow storage escrow = escrows[uuid];
+        require(msg.sender == escrow.sender, "Only the sender can raise a dispute");
+        escrow.disputed = true;
     }
 
     function releaseFund(uint256 uuid) external {
@@ -102,7 +111,8 @@ contract EasyEscrow {
         uint256 finishAfter,
         bytes32 condition,
         bool finished,
-        bool closed
+        bool closed,
+        bool dusputed
     ) {
         Escrow storage escrow = escrows[uuid];
         return (
@@ -113,7 +123,8 @@ contract EasyEscrow {
             escrow.finishAfter,
             escrow.condition,
             escrow.finished,
-            escrow.closed
+            escrow.closed,
+            escrow.disputed
         );
     }
 
